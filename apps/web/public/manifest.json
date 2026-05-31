@@ -1,0 +1,27 @@
+{
+  "name": "Dream Factory",
+  "short_name": "Dream Factory",
+  "description": "Acompanhamento em tempo real da van Dream Factory",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#F8FAFC",
+  "theme_color": "#00A8E8",
+  "categories": ["travel", "navigation", "utilities"],
+  "lang": "pt-BR",
+  "icons": [
+    {
+      "src": "/dream-factory-logo.png",
+      "sizes": "any",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/logo2.png",
+      "sizes": "any",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ]
+}
