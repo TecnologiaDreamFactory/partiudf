@@ -54,7 +54,7 @@ export function AppShell({
           >
             <Logo className="h-8 w-8" />
             <span className="hidden text-sm font-semibold text-df-ink sm:inline">
-              Dream Factory
+              PARTIU DF
             </span>
           </Link>
           {(title || badge) && (

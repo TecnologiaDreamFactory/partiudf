@@ -1,7 +1,7 @@
 import type { NextConfig } from 'next';
 
 const nextConfig: NextConfig = {
-  transpilePackages: ['@dream-driver/shared'],
+  transpilePackages: ['@partiudf/shared'],
   devIndicators: false,
   experimental: {
     devtoolSegmentExplorer: false,

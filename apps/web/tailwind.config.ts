@@ -31,6 +31,7 @@ export default {
       fontFamily: {
         sans: ['var(--font-inter)', 'system-ui', 'sans-serif'],
         display: ['var(--font-outfit)', 'var(--font-inter)', 'sans-serif'],
+        roboto: ['var(--font-roboto)', 'system-ui', 'sans-serif'],
       },
       borderRadius: {
         xl: '0.75rem',

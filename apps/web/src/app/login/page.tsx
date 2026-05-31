@@ -54,7 +54,7 @@ export default function LoginPage() {
         <div className="flex items-center gap-3">
           <Logo className="h-10 w-10" />
           <div>
-            <h1 className="text-xl font-semibold text-df-ink">Dream Factory</h1>
+            <h1 className="text-xl font-semibold text-df-ink">PARTIU DF</h1>
             <p className="text-sm text-df-muted">Entre para continuar</p>
           </div>
         </div>

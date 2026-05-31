@@ -18,7 +18,7 @@ const DRAW_DURATION = 0.9; // s para revelar "PARTIU DF" (preenchimento via más
  * Loader animado em duas fases:
  *  1) A marca "PARTIU DF" é ESCRITA traço a traço (contorno das letras
  *     desenhado via stroke-dashoffset), posicionada acima da van.
- *  2) Assim que a escrita termina, a van da Dream Factory entra rodando da
+ *  2) Assim que a escrita termina, a van da PARTIU DF entra rodando da
  *     DIREITA para a ESQUERDA em loop, com a pista pontilhada correndo no
  *     sentido oposto.
  *
@@ -49,8 +49,7 @@ export function VanLoader({
       {/* Fase 1 — Marca "PARTIU DF" (sólida, revelada por máscara) + logo à direita */}
       <div
         aria-hidden
-        className="relative flex w-full max-w-md -translate-y-16 items-center justify-center gap-3 text-df-blue sm:-translate-y-24 sm:gap-4"
-        style={{ isolation: 'isolate' }}
+        className="relative isolate flex w-full max-w-md -translate-y-16 items-center justify-center gap-3 text-df-blue sm:-translate-y-24 sm:gap-4"
       >
         <motion.svg
           viewBox="0 0 320 100"
@@ -96,15 +95,15 @@ export function VanLoader({
             lengthAdjust="spacingAndGlyphs"
             fill="currentColor"
             mask="url(#partiu-reveal)"
-            // Fonte Roboto (carregada via next/font em layout.tsx e exposta
-            // como --font-roboto no <html>).
-            style={{ fontFamily: 'var(--font-roboto), system-ui, sans-serif' }}
+            // Fonte Roboto: utility `font-roboto` (var(--font-roboto)),
+            // definida em tailwind.config.ts.
+            className="font-roboto"
           >
             PARTIU DF
           </text>
         </motion.svg>
 
-        {/* Logo Dream Factory, à direita da frase (entra após a revelação). */}
+        {/* Logo PARTIU DF, à direita da frase (entra após a revelação). */}
         <motion.img
           src="/logo.png"
           alt=""

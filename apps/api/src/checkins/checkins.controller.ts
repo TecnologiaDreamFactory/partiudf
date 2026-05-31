@@ -7,7 +7,7 @@ import {
   Post,
   UseGuards,
 } from '@nestjs/common';
-import { UserRole } from '@dream-driver/shared';
+import { UserRole } from '@partiudf/shared';
 import { User, type ValidatedUser } from '../auth/auth.controller';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { Roles } from '../auth/roles.decorator';

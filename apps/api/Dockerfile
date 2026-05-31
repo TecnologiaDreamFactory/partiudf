@@ -24,8 +24,8 @@ RUN pnpm --filter "./packages/shared" build
 RUN ls -la packages/shared/dist && test -f packages/shared/dist/index.d.ts
 # Prisma generate precisa de DATABASE_URL (não conecta; só gera o client)
 ENV DATABASE_URL="mysql://placeholder:placeholder@localhost:3306/placeholder"
-RUN pnpm --filter @dream-driver/api exec prisma generate --schema=prisma/schema.prisma
-RUN pnpm --filter @dream-driver/api build
+RUN pnpm --filter @partiudf/api exec prisma generate --schema=prisma/schema.prisma
+RUN pnpm --filter @partiudf/api build
 
 # 3) runtime
 FROM node:22-alpine AS runtime

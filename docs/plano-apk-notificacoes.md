@@ -1,4 +1,4 @@
-# Plano — Transformar Dream Factory em APK + Notificações Push
+# Plano — Transformar PARTIU DF em APK + Notificações Push
 
 > Plano técnico para que o app possa (1) ser instalado como aplicativo no celular (incluindo APK na Play Store) e (2) enviar notificações push para dispositivos com ele instalado.
 
@@ -60,7 +60,7 @@ Criar `apps/web/public/sw.js`:
 ```js
 // Receber push do servidor
 self.addEventListener('push', (event) => {
-  const data = event.data?.json() ?? { title: 'Dream Factory', body: '' };
+  const data = event.data?.json() ?? { title: 'PARTIU DF', body: '' };
   event.waitUntil(
     self.registration.showNotification(data.title, {
       body: data.body,
@@ -150,8 +150,8 @@ model PushSubscription {
 **Dependências:**
 
 ```bash
-pnpm --filter @dream-driver/api add web-push
-pnpm --filter @dream-driver/api add -D @types/web-push
+pnpm --filter @partiudf/api add web-push
+pnpm --filter @partiudf/api add -D @types/web-push
 ```
 
 **Endpoint Nest** (`apps/api/src/push/push.controller.ts`):
@@ -222,15 +222,15 @@ O cálculo de "van se aproximando" vive no `RealtimeGateway` quando processa `tr
 - **Bundled** (`output: 'export'` no Next): app empacota HTML estático. Sem SSR. Mais leve, funciona offline.
 - **Remote**: WebView aponta para URL HTTPS hospedada. Mantém SSR. Precisa de internet.
 
-> Para o Dream Factory provavelmente **modo remote** é mais simples (não obriga refatorar o Next para export).
+> Para o PARTIU DF provavelmente **modo remote** é mais simples (não obriga refatorar o Next para export).
 
 ### 2.3. Setup inicial
 
 ```bash
-pnpm --filter @dream-driver/web add @capacitor/core @capacitor/android
-pnpm --filter @dream-driver/web add -D @capacitor/cli
+pnpm --filter @partiudf/web add @capacitor/core @capacitor/android
+pnpm --filter @partiudf/web add -D @capacitor/cli
 cd apps/web
-npx cap init "Dream Factory" com.dreamfactory.app --web-dir=public
+npx cap init "PARTIU DF" com.dreamfactory.app --web-dir=public
 npx cap add android
 ```
 
@@ -239,7 +239,7 @@ npx cap add android
 ```ts
 {
   appId: 'com.dreamfactory.app',
-  appName: 'Dream Factory',
+  appName: 'PARTIU DF',
   webDir: 'public',  // se modo bundled
   server: {
     url: 'https://app.dreamfactory.com.br',  // se modo remote
@@ -251,7 +251,7 @@ npx cap add android
 ### 2.4. Push nativo via FCM
 
 ```bash
-pnpm --filter @dream-driver/web add @capacitor/push-notifications
+pnpm --filter @partiudf/web add @capacitor/push-notifications
 npx cap sync android
 ```
 
@@ -280,7 +280,7 @@ PushNotifications.addListener('registration', ({ value: fcmToken }) => {
 **Backend:** novo endpoint que armazena `FcmToken` (modelo separado de `PushSubscription` web). Service usa SDK do `firebase-admin` para enviar.
 
 ```bash
-pnpm --filter @dream-driver/api add firebase-admin
+pnpm --filter @partiudf/api add firebase-admin
 ```
 
 ```ts
@@ -298,7 +298,7 @@ await admin.messaging().send({
 Para a tela do motorista (`/d`), trocar `navigator.geolocation.watchPosition` por:
 
 ```bash
-pnpm --filter @dream-driver/web add @capacitor/geolocation
+pnpm --filter @partiudf/web add @capacitor/geolocation
 ```
 
 ```ts
@@ -312,7 +312,7 @@ const id = await Geolocation.watchPosition({ enableHighAccuracy: true }, (pos) =
 E adicionar plugin específico para **foreground service** (notificação persistente "Compartilhando localização") — exigência do Android 10+:
 
 ```bash
-pnpm --filter @dream-driver/web add @capacitor-community/background-geolocation
+pnpm --filter @partiudf/web add @capacitor-community/background-geolocation
 ```
 
 Configurar `AndroidManifest.xml` com permissões `ACCESS_BACKGROUND_LOCATION` e `FOREGROUND_SERVICE_LOCATION`.

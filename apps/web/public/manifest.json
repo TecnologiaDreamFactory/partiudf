@@ -1,7 +1,7 @@
 {
-  "name": "Dream Factory",
-  "short_name": "Dream Factory",
-  "description": "Acompanhamento em tempo real da van Dream Factory",
+  "name": "PARTIU DF",
+  "short_name": "PARTIU DF",
+  "description": "Acompanhamento em tempo real da van PARTIU DF",
   "start_url": "/",
   "scope": "/",
   "display": "standalone",

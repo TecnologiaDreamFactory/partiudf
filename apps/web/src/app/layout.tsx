@@ -25,13 +25,13 @@ const roboto = Roboto({
 });
 
 export const metadata: Metadata = {
-  title: 'Dream Factory',
-  description: 'Acompanhamento em tempo real da van Dream Factory',
+  title: 'PARTIU DF',
+  description: 'Acompanhamento em tempo real da van PARTIU DF',
   manifest: '/manifest.json',
-  applicationName: 'Dream Factory',
+  applicationName: 'PARTIU DF',
   appleWebApp: {
     capable: true,
-    title: 'Dream Factory',
+    title: 'PARTIU DF',
     statusBarStyle: 'default',
   },
   icons: {

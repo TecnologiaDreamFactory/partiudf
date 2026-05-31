@@ -1,4 +1,4 @@
-# Dream Flow
+# PARTIU DF
 
 Monorepo com pnpm + Turborepo contendo aplicações web (Next.js) e API (NestJS), além de pacotes compartilhados.
 
@@ -55,19 +55,19 @@ Aguarde 10–15 segundos para o MySQL inicializar. O banco `dreamdriver` é cria
 ### 6. Gerar o Prisma Client
 
 ```bash
-pnpm --filter @dream-driver/api exec prisma generate
+pnpm --filter @partiudf/api exec prisma generate
 ```
 
 ### 7. Criar as tabelas no banco
 
 ```bash
-pnpm --filter @dream-driver/api exec prisma db push
+pnpm --filter @partiudf/api exec prisma db push
 ```
 
 ### 8. Compilar o pacote compartilhado
 
 ```bash
-pnpm --filter @dream-driver/shared build
+pnpm --filter @partiudf/shared build
 ```
 
 ### 9. Popular o banco com dados iniciais (recomendado)
@@ -76,12 +76,12 @@ Cria usuários de teste e pontos de coleta. Necessário para fazer login na apli
 
 ```bash
 # Windows (PowerShell) — cria admin + pickup points
-$env:NODE_ENV="development"; pnpm --filter @dream-driver/api prisma:seed
+$env:NODE_ENV="development"; pnpm --filter @partiudf/api prisma:seed
 ```
 
 ```bash
 # Linux / Mac
-NODE_ENV=development pnpm --filter @dream-driver/api prisma:seed
+NODE_ENV=development pnpm --filter @partiudf/api prisma:seed
 ```
 
 ### 10. Rodar o projeto
@@ -155,17 +155,17 @@ Aguarde alguns segundos e tente novamente.
 Se recriou o container ou o banco está vazio, execute novamente:
 
 ```bash
-pnpm --filter @dream-driver/api exec prisma db push
-$env:NODE_ENV="development"; pnpm --filter @dream-driver/api prisma:seed   # Windows
-# ou: NODE_ENV=development pnpm --filter @dream-driver/api prisma:seed    # Linux/Mac
+pnpm --filter @partiudf/api exec prisma db push
+$env:NODE_ENV="development"; pnpm --filter @partiudf/api prisma:seed   # Windows
+# ou: NODE_ENV=development pnpm --filter @partiudf/api prisma:seed    # Linux/Mac
 ```
 
-### Erro "Cannot find module '@dream-driver/shared'" ao fazer build
+### Erro "Cannot find module '@partiudf/shared'" ao fazer build
 
 O pacote compartilhado precisa ser compilado antes. Execute:
 
 ```bash
-pnpm --filter @dream-driver/shared build
+pnpm --filter @partiudf/shared build
 ```
 
 Depois rode `pnpm build` ou `pnpm dev` novamente.
@@ -206,13 +206,13 @@ dream-driver/
 
 ```bash
 # Rodar apenas a web
-pnpm --filter @dream-driver/web dev
+pnpm --filter @partiudf/web dev
 
 # Rodar apenas a API
-pnpm --filter @dream-driver/api dev
+pnpm --filter @partiudf/api dev
 
 # Build do shared (necessário antes de usar em dev)
-pnpm --filter @dream-driver/shared build
+pnpm --filter @partiudf/shared build
 ```
 
 ## URLs de desenvolvimento

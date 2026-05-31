@@ -1,4 +1,4 @@
-// Converte dream-factory-manual.md -> dream-factory-manual.html com tema Dream Factory.
+// Converte dream-factory-manual.md -> dream-factory-manual.html com tema PARTIU DF.
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -9,11 +9,22 @@ const mdPath = path.join(__dirname, 'dream-factory-manual.md');
 const htmlPath = path.join(__dirname, 'dream-factory-manual.html');
 
 const md = fs.readFileSync(mdPath, 'utf8');
-const title = 'Dream Factory — Manual técnico';
+const title = 'PARTIU DF — Manual técnico';
 
 marked.setOptions({ gfm: true, breaks: false });
 
-const body = marked.parse(md);
+let body = marked.parse(md);
+
+// a11y / lint HTML: normaliza os checkboxes das task lists.
+// O marked gera `<input disabled="" type="checkbox">` (valor de atributo vazio e
+// sem nome acessível) — o que dispara avisos. Aqui viram atributos boolean +
+// aria-label descrevendo o estado.
+body = body.replace(/<input\b[^>]*type="checkbox"[^>]*>/g, (tag) => {
+  const checked = /\bchecked\b/.test(tag);
+  return `<input type="checkbox" disabled${checked ? ' checked' : ''} aria-label="${
+    checked ? 'concluído' : 'pendente'
+  }">`;
+});
 
 const html = `<!DOCTYPE html>
 <html lang="pt-BR">
@@ -225,7 +236,7 @@ const html = `<!DOCTYPE html>
   <div class="container">
     <div class="brand">
       <div class="brand-mark" aria-hidden="true"></div>
-      <span class="brand-text">Dream Factory</span>
+      <span class="brand-text">PARTIU DF</span>
     </div>
     ${body}
     <div class="footer">

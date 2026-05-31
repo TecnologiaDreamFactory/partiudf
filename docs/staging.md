@@ -61,7 +61,7 @@ Certifique-se de que `PORT` é respeitado (plataformas cloud usam `process.env.P
 2. **Permissão de localização**
    - Página do passageiro (`/p`) e motorista (`/d`) usam geolocalização
    - Aceite a permissão quando solicitado
-   - Em Configurações → Apps, confira se o Dream Driver tem permissão de localização
+   - Em Configurações → Apps, confira se o PARTIU DF tem permissão de localização
 
 3. **Teste de tracking**
    - Login como motorista → Iniciar trip → Iniciar tracking real

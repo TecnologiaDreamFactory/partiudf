@@ -78,9 +78,9 @@ pnpm dev
 
 **Prod (sem botão "N" do Next):**
 ```bash
-pnpm --filter @dream-driver/web build
-pnpm --filter @dream-driver/api start &
-pnpm --filter @dream-driver/web start &
+pnpm --filter @partiudf/web build
+pnpm --filter @partiudf/api start &
+pnpm --filter @partiudf/web start &
 ```
 
 URLs:
@@ -89,7 +89,7 @@ URLs:
 
 ---
 
-## 2. Reforma do front — Style guide Dream Factory
+## 2. Reforma do front — Style guide PARTIU DF
 
 ### 2.1. Tokens de design (CSS variables)
 
@@ -112,7 +112,7 @@ Definidos em [apps/web/src/app/globals.css](../apps/web/src/app/globals.css), ex
 ### 2.2. Dependências instaladas
 
 ```bash
-pnpm --filter @dream-driver/web add \
+pnpm --filter @partiudf/web add \
   class-variance-authority clsx tailwind-merge \
   lucide-react sonner next-themes --ignore-scripts
 ```
@@ -245,15 +245,15 @@ A pedido — passageiro nunca passa por tela de login.
 
 ## 6. Splash animado com a van (VanLoader)
 
-A pedido — tela de carregamento personalizada com a van da Dream Factory atravessando a tela antes do app abrir.
+A pedido — tela de carregamento personalizada com a van da PARTIU DF atravessando a tela antes do app abrir.
 
 **Biblioteca:** [`motion`](https://motion.dev) (Framer Motion v12) — animações React declarativas, hardware-accelerated.
 
 ```bash
-pnpm --filter @dream-driver/web add motion --ignore-scripts
+pnpm --filter @partiudf/web add motion --ignore-scripts
 ```
 
-**Asset:** `apps/web/public/van.png` (PNG da van Dream Factory, espelhado por CSS `transform: scaleX(-1)` para apontar na direção certa).
+**Asset:** `apps/web/public/van.png` (PNG da van PARTIU DF, espelhado por CSS `transform: scaleX(-1)` para apontar na direção certa).
 
 **Componente:** [`apps/web/src/components/VanLoader.tsx`](../apps/web/src/components/VanLoader.tsx)
 
@@ -302,7 +302,7 @@ apps/web/
 ├── package.json                            (CVA, clsx, twmerge, lucide, sonner, next-themes, motion)
 ├── public/
 │   ├── manifest.json                       (PWA)
-│   ├── logo2.png                           (logo Dream Factory)
+│   ├── logo2.png                           (logo PARTIU DF)
 │   └── van.png                             (NEW — usado no VanLoader)
 └── src/
     ├── app/

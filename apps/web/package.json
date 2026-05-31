@@ -1,5 +1,5 @@
 {
-  "name": "@dream-driver/web",
+  "name": "@partiudf/web",
   "version": "0.0.0",
   "private": true,
   "scripts": {
@@ -10,7 +10,7 @@
     "lint:fix": "next lint --fix"
   },
   "dependencies": {
-    "@dream-driver/shared": "workspace:*",
+    "@partiudf/shared": "workspace:*",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "leaflet": "^1.9.4",

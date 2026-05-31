@@ -65,4 +65,4 @@ O passageiro **não passa pela tela de login** com e-mail/senha; a app obtém au
 
 ---
 
-*Dream Driver — documentação interna.*
+*PARTIU DF — documentação interna.*

@@ -39,8 +39,8 @@ COPY --from=deps /app/apps/web/node_modules ./apps/web/node_modules
 COPY --from=deps /app/packages/shared/node_modules ./packages/shared/node_modules
 
 # Build: shared primeiro, depois web
-RUN pnpm --filter @dream-driver/shared build
-RUN pnpm --filter web build
+RUN pnpm --filter @partiudf/shared build
+RUN pnpm --filter @partiudf/web build
 
 # ========== Stage 3: runner ==========
 FROM node:20-alpine AS runner
@@ -64,4 +64,4 @@ USER nextjs
 
 EXPOSE 8080
 
-CMD ["sh", "-c", "pnpm --filter web start -p ${PORT}"]
+CMD ["sh", "-c", "pnpm --filter @partiudf/web start -p ${PORT}"]

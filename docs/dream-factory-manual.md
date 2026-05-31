@@ -1,4 +1,4 @@
-# Dream Factory — Manual técnico consolidado
+# PARTIU DF — Manual técnico consolidado
 
 > Documento único reunindo: instruções para rodar o app, bibliotecas utilizadas, decisões de design, mudanças feitas na sessão de 2026-05-22 e plano para virar APK com notificações push.
 
@@ -9,7 +9,7 @@
 1. [Visão geral do stack](#1-visão-geral-do-stack)
 2. [Bibliotecas e ferramentas](#2-bibliotecas-e-ferramentas)
 3. [Como rodar o app localmente](#3-como-rodar-o-app-localmente)
-4. [Style guide Dream Factory](#4-style-guide-dream-factory)
+4. [Style guide PARTIU DF](#4-style-guide-dream-factory)
 5. [Dark mode](#5-dark-mode)
 6. [Splash animado com a van](#6-splash-animado-com-a-van)
 7. [Decisões e correções de UX](#7-decisões-e-correções-de-ux)
@@ -165,10 +165,10 @@ pnpm dev
 
 **Prod (sem botão "N" do Next, mais rápido):**
 ```bash
-pnpm --filter @dream-driver/web build
+pnpm --filter @partiudf/web build
 # em outro terminal:
-pnpm --filter @dream-driver/api start
-pnpm --filter @dream-driver/web start
+pnpm --filter @partiudf/api start
+pnpm --filter @partiudf/web start
 ```
 
 ### 3.7. URLs
@@ -185,7 +185,7 @@ docker exec -it dreamdriver-mysql mysql -uroot -proot dreamdriver
 
 ---
 
-## 4. Style guide Dream Factory
+## 4. Style guide PARTIU DF
 
 ### 4.1. Tokens de design (CSS variables)
 
@@ -256,14 +256,14 @@ Configurado no [layout.tsx](../apps/web/src/app/layout.tsx) via `next/font/googl
 
 ## 6. Splash animado com a van
 
-Tela de carregamento personalizada com a van Dream Factory atravessando antes do app abrir.
+Tela de carregamento personalizada com a van PARTIU DF atravessando antes do app abrir.
 
 ### 6.1. Biblioteca
 
 [`motion`](https://motion.dev) — Framer Motion v12, animações React declarativas, hardware-accelerated.
 
 ```bash
-pnpm --filter @dream-driver/web add motion --ignore-scripts
+pnpm --filter @partiudf/web add motion --ignore-scripts
 ```
 
 ### 6.2. Asset
@@ -383,7 +383,7 @@ apps/web/
 ├── package.json                            (CVA, clsx, twmerge, lucide, sonner, next-themes, motion)
 ├── public/
 │   ├── manifest.json                       (PWA)
-│   ├── logo2.png                           (logo Dream Factory)
+│   ├── logo2.png                           (logo PARTIU DF)
 │   └── van.png                             (NEW — usado no VanLoader)
 └── src/
     ├── app/

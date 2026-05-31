@@ -9,7 +9,7 @@ import {
   Query,
   UseGuards,
 } from '@nestjs/common';
-import { UserRole } from '@dream-driver/shared';
+import { UserRole } from '@partiudf/shared';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { User, type ValidatedUser } from '../auth/auth.controller';
 import { Roles } from '../auth/roles.decorator';

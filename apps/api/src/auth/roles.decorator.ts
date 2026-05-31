@@ -1,5 +1,5 @@
 import { SetMetadata } from '@nestjs/common';
-import type { UserRole } from '@dream-driver/shared';
+import type { UserRole } from '@partiudf/shared';
 
 export const ROLES_KEY = 'roles';
 

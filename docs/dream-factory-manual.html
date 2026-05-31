@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Dream Factory — Manual técnico</title>
+  <title>PARTIU DF — Manual técnico</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&family=Outfit:wght@600;700&display=swap" rel="stylesheet" />
@@ -208,9 +208,9 @@
   <div class="container">
     <div class="brand">
       <div class="brand-mark" aria-hidden="true"></div>
-      <span class="brand-text">Dream Factory</span>
+      <span class="brand-text">PARTIU DF</span>
     </div>
-    <h1>Dream Factory — Manual técnico consolidado</h1>
+    <h1>PARTIU DF — Manual técnico consolidado</h1>
 <blockquote>
 <p>Documento único reunindo: instruções para rodar o app, bibliotecas utilizadas, decisões de design, mudanças feitas na sessão de 2026-05-22 e plano para virar APK com notificações push.</p>
 </blockquote>
@@ -220,7 +220,7 @@
 <li><a href="#1-vis%C3%A3o-geral-do-stack">Visão geral do stack</a></li>
 <li><a href="#2-bibliotecas-e-ferramentas">Bibliotecas e ferramentas</a></li>
 <li><a href="#3-como-rodar-o-app-localmente">Como rodar o app localmente</a></li>
-<li><a href="#4-style-guide-dream-factory">Style guide Dream Factory</a></li>
+<li><a href="#4-style-guide-dream-factory">Style guide PARTIU DF</a></li>
 <li><a href="#5-dark-mode">Dark mode</a></li>
 <li><a href="#6-splash-animado-com-a-van">Splash animado com a van</a></li>
 <li><a href="#7-decis%C3%B5es-e-corre%C3%A7%C3%B5es-de-ux">Decisões e correções de UX</a></li>
@@ -430,13 +430,8 @@ node prisma/patch-client-node25.js                     # patch Node 24+
 <p>O patch substitui <code>require(&#39;#main-entry-point&#39;)</code> por <code>require(&#39;./index.js&#39;)</code> no client gerado, contornando o erro <code>ERR_PACKAGE_IMPORT_NOT_DEFINED</code> do Node 24+ com Prisma 7.</p>
 </blockquote>
 <h3>3.5. Popular o banco (seed)</h3>
-<pre><code class="language-bash"># Linux / macOS (bash)
-cd apps/api
+<pre><code class="language-bash">cd apps/api
 NODE_ENV=development node prisma/seed.js
-
-# Windows (PowerShell)
-cd apps/api
-$env:NODE_ENV=&quot;development&quot;; node prisma/seed.js
 </code></pre>
 <p>Usuários de teste criados:</p>
 <table>
@@ -475,10 +470,10 @@ node prisma/set-password.js admin@local 312408
 <pre><code class="language-bash">pnpm dev
 </code></pre>
 <p><strong>Prod (sem botão &quot;N&quot; do Next, mais rápido):</strong></p>
-<pre><code class="language-bash">pnpm --filter @dream-driver/web build
+<pre><code class="language-bash">pnpm --filter @partiudf/web build
 # em outro terminal:
-pnpm --filter @dream-driver/api start
-pnpm --filter @dream-driver/web start
+pnpm --filter @partiudf/api start
+pnpm --filter @partiudf/web start
 </code></pre>
 <h3>3.7. URLs</h3>
 <ul>
@@ -490,7 +485,7 @@ pnpm --filter @dream-driver/web start
 <pre><code class="language-bash">docker exec -it dreamdriver-mysql mysql -uroot -proot dreamdriver
 </code></pre>
 <hr>
-<h2>4. Style guide Dream Factory</h2>
+<h2>4. Style guide PARTIU DF</h2>
 <h3>4.1. Tokens de design (CSS variables)</h3>
 <p>Definidos em <a href="../apps/web/src/app/globals.css">apps/web/src/app/globals.css</a>, expostos no Tailwind via <a href="../apps/web/tailwind.config.ts">apps/web/tailwind.config.ts</a>:</p>
 <table>
@@ -660,10 +655,10 @@ pnpm --filter @dream-driver/web start
 </ul>
 <hr>
 <h2>6. Splash animado com a van</h2>
-<p>Tela de carregamento personalizada com a van Dream Factory atravessando antes do app abrir.</p>
+<p>Tela de carregamento personalizada com a van PARTIU DF atravessando antes do app abrir.</p>
 <h3>6.1. Biblioteca</h3>
 <p><a href="https://motion.dev"><code>motion</code></a> — Framer Motion v12, animações React declarativas, hardware-accelerated.</p>
-<pre><code class="language-bash">pnpm --filter @dream-driver/web add motion --ignore-scripts
+<pre><code class="language-bash">pnpm --filter @partiudf/web add motion --ignore-scripts
 </code></pre>
 <h3>6.2. Asset</h3>
 <p><code>apps/web/public/van.png</code> (PNG da van; espelhada por CSS <code>transform: scaleX(-1)</code> para apontar na direção certa).</p>
@@ -756,7 +751,7 @@ const showApp   = authOk === true &amp;&amp; splashDone;
 ├── package.json                            (CVA, clsx, twmerge, lucide, sonner, next-themes, motion)
 ├── public/
 │   ├── manifest.json                       (PWA)
-│   ├── logo2.png                           (logo Dream Factory)
+│   ├── logo2.png                           (logo PARTIU DF)
 │   └── van.png                             (NEW — usado no VanLoader)
 └── src/
     ├── app/
@@ -909,14 +904,14 @@ docs/
 <hr>
 <h2>11. Próximos passos sugeridos</h2>
 <ul>
-<li><input disabled="" type="checkbox"> Migrar <code>/d</code> (motorista) para o novo design system</li>
-<li><input disabled="" type="checkbox"> Migrar <code>/admin</code> (~769 linhas)</li>
-<li><input disabled="" type="checkbox"> Migrar <code>/profile</code> (~201 linhas)</li>
-<li><input disabled="" type="checkbox"> Gerar ícones PWA em vários tamanhos (192×192, 512×512, maskable) a partir do logo</li>
-<li><input disabled="" type="checkbox"> HTTPS local para testar GPS no celular via IP (ngrok / cloudflared / mkcert)</li>
-<li><input disabled="" type="checkbox"> Trocar <code>&lt;img&gt;</code> por <code>&lt;Image&gt;</code> do <code>next/image</code> nos lugares marcados pelo lint</li>
-<li><input disabled="" type="checkbox"> Executar a Fase 1 do plano: PWA + Web Push</li>
-<li><input disabled="" type="checkbox"> (Posterior) Executar Fase 2 com Capacitor + FCM se necessário</li>
+<li><input type="checkbox" disabled aria-label="pendente"> Migrar <code>/d</code> (motorista) para o novo design system</li>
+<li><input type="checkbox" disabled aria-label="pendente"> Migrar <code>/admin</code> (~769 linhas)</li>
+<li><input type="checkbox" disabled aria-label="pendente"> Migrar <code>/profile</code> (~201 linhas)</li>
+<li><input type="checkbox" disabled aria-label="pendente"> Gerar ícones PWA em vários tamanhos (192×192, 512×512, maskable) a partir do logo</li>
+<li><input type="checkbox" disabled aria-label="pendente"> HTTPS local para testar GPS no celular via IP (ngrok / cloudflared / mkcert)</li>
+<li><input type="checkbox" disabled aria-label="pendente"> Trocar <code>&lt;img&gt;</code> por <code>&lt;Image&gt;</code> do <code>next/image</code> nos lugares marcados pelo lint</li>
+<li><input type="checkbox" disabled aria-label="pendente"> Executar a Fase 1 do plano: PWA + Web Push</li>
+<li><input type="checkbox" disabled aria-label="pendente"> (Posterior) Executar Fase 2 com Capacitor + FCM se necessário</li>
 </ul>
 
     <div class="footer">
