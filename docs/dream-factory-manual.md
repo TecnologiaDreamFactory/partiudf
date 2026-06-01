@@ -52,7 +52,7 @@ dream-driver/
 
 | Pacote | Versão (aprox.) | Para que |
 |---|---|---|
-| Node.js | 18+ (testado em 24) | Runtime JS |
+| Node.js | 20+ (testado em 24) | Runtime JS |
 | pnpm | 9.14.2 | Gerenciador de pacotes monorepo |
 | Turborepo | 2.x | Orquestrador de tarefas no monorepo |
 | Docker | — | MySQL local em container |
@@ -101,7 +101,7 @@ dream-driver/
 
 ### 3.1. Pré-requisitos
 
-- Node.js 18+ — [nodejs.org](https://nodejs.org)
+- Node.js 20+ — [nodejs.org](https://nodejs.org)
 - Docker (para o MySQL) — [docker.com](https://docker.com)
 - pnpm: `npm install -g pnpm`
 

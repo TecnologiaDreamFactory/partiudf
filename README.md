@@ -4,7 +4,7 @@ Monorepo com pnpm + Turborepo contendo aplicações web (Next.js) e API (NestJS)
 
 ## Pré-requisitos
 
-- **Node.js 18+** — [nodejs.org](https://nodejs.org)
+- **Node.js 20+** — [nodejs.org](https://nodejs.org)
 - **Docker** — para rodar o banco de dados MySQL ([docker.com](https://docker.com))
 
 ## Instalação local (passo a passo)
@@ -111,7 +111,7 @@ Para **liberar espaço** (opcional): apague `node_modules` e execute `pnpm i` qu
 - **Executar na sua máquina:** sem `node_modules` é necessário rodar **`pnpm i`** outra vez antes de `pnpm dev` ou `pnpm build`. É o mesmo fluxo de clonar o repo em outro computador.
 - **Cache e build:** `apps/web/.next` e `.turbo` podem ser apagados; o Next.js e o Turborepo os **recriam** ao rodar `dev`/`build`.
 
-Sucesso local também depende de Node 18+ (ver `engines` no `package.json`), pnpm compatível com o campo `packageManager`, rede para baixar pacotes, MySQL/Docker e `.env` — como em qualquer ambiente de desenvolvimento.
+Sucesso local também depende de Node 20+ (ver `engines` no `package.json`), pnpm compatível com o campo `packageManager`, rede para baixar pacotes, MySQL/Docker e `.env` — como em qualquer ambiente de desenvolvimento.
 
 ---
 
