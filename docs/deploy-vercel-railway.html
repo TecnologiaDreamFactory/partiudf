@@ -124,11 +124,12 @@
       <a href="#fase1">3. Fase 1 — Railway (MySQL + API)</a>
       <a href="#fase2">4. Fase 2 — Vercel (Web)</a>
       <a href="#fase3">5. Fase 3 — Ligar os dois</a>
-      <a href="#verificacao">6. Verificação final</a>
-      <a href="#cicd">7. CI/CD</a>
-      <a href="#problemas">8. Solução de problemas</a>
-      <a href="#custos">9. Custos estimados</a>
-      <a href="#checklist">10. Checklist</a>
+      <a href="#dominio">6. Domínio próprio (opcional)</a>
+      <a href="#verificacao">7. Verificação final</a>
+      <a href="#cicd">8. CI/CD</a>
+      <a href="#problemas">9. Solução de problemas</a>
+      <a href="#custos">10. Custos estimados</a>
+      <a href="#checklist">11. Checklist</a>
     </nav>
   </div>
 
@@ -271,7 +272,45 @@ railway link          # escolha o projeto e o serviço da API
 railway run pnpm --filter @partiudf/api prisma:seed:prod</code></pre>
   <p>O seed usa <code>SEED_ADMIN_EMAIL</code> / <code>SEED_ADMIN_PASSWORD</code> do Railway para criar o admin.</p>
 
-  <h2 id="verificacao">6. Verificação final</h2>
+  <h2 id="dominio">6. Domínio próprio (opcional)</h2>
+  <p>Tanto <strong>Railway</strong> quanto <strong>Vercel</strong> aceitam domínio próprio com
+     <strong>HTTPS automático</strong>. O recomendado são <strong>dois subdomínios</strong>:</p>
+  <table>
+    <tr><th>Peça</th><th>Onde</th><th>Domínio sugerido</th></tr>
+    <tr><td>Web</td><td>Vercel</td><td><code>app.seudominio.com.br</code> (ou a raiz <code>seudominio.com.br</code>)</td></tr>
+    <tr><td>API</td><td>Railway</td><td><code>api.seudominio.com.br</code></td></tr>
+    <tr><td>MySQL</td><td>Railway</td><td>— (interno, sem domínio público)</td></tr>
+  </table>
+
+  <h3>6.1 API no Railway</h3>
+  <ol>
+    <li>Railway → serviço da API → <strong>Settings → Networking → Custom Domain</strong>.</li>
+    <li>Digite <code>api.seudominio.com.br</code>.</li>
+    <li>O Railway mostra um registro <strong>CNAME</strong> (ex.: <code>api</code> → <code>xxxx.up.railway.app</code>). Crie-o no seu provedor de DNS.</li>
+    <li>Aguarde a propagação (minutos a algumas horas). O <strong>SSL é emitido automaticamente</strong>.</li>
+  </ol>
+
+  <h3>6.2 Web na Vercel</h3>
+  <ol>
+    <li>Vercel → projeto → <strong>Settings → Domains → Add</strong>.</li>
+    <li>Digite <code>app.seudominio.com.br</code> (ou a raiz <code>seudominio.com.br</code>).</li>
+    <li>Crie o registro que a Vercel indicar (<strong>CNAME</strong> para subdomínio; <strong>A/ALIAS</strong> para a raiz).</li>
+    <li>SSL automático.</li>
+  </ol>
+
+  <h3>6.3 Atualizar as variáveis (obrigatório)</h3>
+  <p>Ao migrar para o domínio próprio, ajuste estas variáveis — senão CORS/WebSocket quebram:</p>
+  <table>
+    <tr><th>Onde</th><th>Variável</th><th>Novo valor</th></tr>
+    <tr><td>Railway (API)</td><td><code>CORS_ORIGIN</code></td><td><code>https://app.seudominio.com.br</code></td></tr>
+    <tr><td>Vercel (Web)</td><td><code>NEXT_PUBLIC_API_URL</code></td><td><code>https://api.seudominio.com.br</code></td></tr>
+    <tr><td>Vercel (Web)</td><td><code>NEXT_PUBLIC_WS_URL</code></td><td><code>https://api.seudominio.com.br</code></td></tr>
+  </table>
+  <div class="warn">As <code>NEXT_PUBLIC_*</code> são embutidas no build → <strong>rebuilde a web</strong>
+    na Vercel depois de mudar. Railway e Vercel <strong>não cobram extra</strong> por domínio próprio;
+    você paga só o registrador (~R$40–60/ano).</div>
+
+  <h2 id="verificacao">7. Verificação final</h2>
   <ol>
     <li>Abra <code>https://SUA-API.up.railway.app/health</code> → deve responder <code>{"ok":true,...}</code>.</li>
     <li>Abra a URL da Vercel no navegador.</li>
@@ -281,14 +320,14 @@ railway run pnpm --filter @partiudf/api prisma:seed:prod</code></pre>
   <div class="note"><strong>PWA + geolocalização</strong> só funcionam em <strong>HTTPS</strong> —
     Vercel e Railway já fornecem HTTPS por padrão. ✅</div>
 
-  <h2 id="cicd">7. CI/CD (deploy automático)</h2>
+  <h2 id="cicd">8. CI/CD (deploy automático)</h2>
   <ul>
     <li><strong>Vercel</strong>: cada <code>push</code> na <code>main</code> redeploya a web.</li>
     <li><strong>Railway</strong>: cada <code>push</code> na <code>main</code> redeploya a API.</li>
     <li>Migrations rodam sozinhas no boot da API (<code>entrypoint.sh → prisma migrate deploy</code>).</li>
   </ul>
 
-  <h2 id="problemas">8. Solução de problemas</h2>
+  <h2 id="problemas">9. Solução de problemas</h2>
   <table>
     <tr><th>Sintoma</th><th>Causa provável</th><th>Correção</th></tr>
     <tr><td><code>ERR_VM_DYNAMIC_IMPORT_CALLBACK_MISSING</code></td><td>pnpm novo em Node antigo</td><td>Node 20+ no ambiente (resolvido)</td></tr>
@@ -300,7 +339,7 @@ railway run pnpm --filter @partiudf/api prisma:seed:prod</code></pre>
     <tr><td>API não conecta no banco</td><td><code>DATABASE_URL</code> errado</td><td>usar <code>${{MySQL.MYSQL_URL}}</code>; MySQL no mesmo projeto</td></tr>
   </table>
 
-  <h2 id="custos">9. Custos estimados</h2>
+  <h2 id="custos">10. Custos estimados</h2>
   <table>
     <tr><th>Item</th><th>Serviço</th><th>Custo</th></tr>
     <tr><td>Web</td><td>Vercel (Hobby)</td><td>Grátis</td></tr>
@@ -312,7 +351,7 @@ railway run pnpm --filter @partiudf/api prisma:seed:prod</code></pre>
     <code>api.seudominio.com</code>, também no Railway — depois atualize <code>CORS_ORIGIN</code> e as
     <code>NEXT_PUBLIC_*</code> (com rebuild da web).</div>
 
-  <h2 id="checklist">10. Checklist resumido</h2>
+  <h2 id="checklist">11. Checklist resumido</h2>
   <ul class="checklist">
     <li>Railway: criar projeto + MySQL</li>
     <li>Railway: criar serviço da API (Dockerfile <code>apps/api/Dockerfile</code>, root <code>/</code>)</li>
@@ -322,6 +361,7 @@ railway run pnpm --filter @partiudf/api prisma:seed:prod</code></pre>
     <li>Vercel: deploy + anotar URL</li>
     <li>Railway: definir <code>CORS_ORIGIN</code> = URL da Vercel</li>
     <li>Rodar seed do admin (Railway CLI)</li>
+    <li>(Opcional) Domínio próprio na Vercel/Railway + atualizar <code>CORS_ORIGIN</code> e <code>NEXT_PUBLIC_*</code> (rebuild da web)</li>
     <li>Testar: <code>/health</code>, login, mapa, GPS, WebSocket, PWA no Android</li>
   </ul>
 

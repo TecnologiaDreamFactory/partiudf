@@ -168,7 +168,47 @@ O seed usa as variáveis do Railway (`SEED_ADMIN_EMAIL` / `SEED_ADMIN_PASSWORD`)
 
 ---
 
-## 6. Verificação final
+## 6. Domínio próprio (opcional)
+
+Tanto **Railway** quanto **Vercel** aceitam domínio próprio com **HTTPS automático**. O recomendado
+são **dois subdomínios**:
+
+| Peça | Onde | Domínio sugerido |
+|---|---|---|
+| Web | Vercel | `app.seudominio.com.br` (ou a raiz `seudominio.com.br`) |
+| API | Railway | `api.seudominio.com.br` |
+| MySQL | Railway | — (interno, sem domínio público) |
+
+### 6.1 API no Railway
+
+1. Railway → serviço da API → **Settings → Networking → Custom Domain**.
+2. Digite `api.seudominio.com.br`.
+3. O Railway mostra um registro **CNAME** (ex.: `api` → `xxxx.up.railway.app`). Crie-o no seu provedor de DNS.
+4. Aguarde a propagação (minutos a algumas horas). O **SSL é emitido automaticamente**.
+
+### 6.2 Web na Vercel
+
+1. Vercel → projeto → **Settings → Domains → Add**.
+2. Digite `app.seudominio.com.br` (ou a raiz `seudominio.com.br`).
+3. Crie o registro que a Vercel indicar (**CNAME** para subdomínio; **A/ALIAS** para a raiz).
+4. SSL automático.
+
+### 6.3 Atualizar as variáveis (obrigatório)
+
+Ao migrar para o domínio próprio, ajuste estas variáveis — senão CORS/WebSocket quebram:
+
+| Onde | Variável | Novo valor |
+|---|---|---|
+| Railway (API) | `CORS_ORIGIN` | `https://app.seudominio.com.br` |
+| Vercel (Web) | `NEXT_PUBLIC_API_URL` | `https://api.seudominio.com.br` |
+| Vercel (Web) | `NEXT_PUBLIC_WS_URL` | `https://api.seudominio.com.br` |
+
+> ⚠️ As `NEXT_PUBLIC_*` são embutidas no build → **rebuilde a web** na Vercel depois de mudar.
+> Railway e Vercel **não cobram extra** por domínio próprio; você paga só o registrador (~R$40–60/ano).
+
+---
+
+## 7. Verificação final
 
 1. Abra `https://SUA-API.up.railway.app/health` → deve responder `{"ok":true,...}`.
 2. Abra a URL da Vercel no navegador.
@@ -179,7 +219,7 @@ O seed usa as variáveis do Railway (`SEED_ADMIN_EMAIL` / `SEED_ADMIN_PASSWORD`)
 
 ---
 
-## 7. CI/CD (deploy automático)
+## 8. CI/CD (deploy automático)
 
 - **Vercel**: cada `push` na branch `main` redeploya a web automaticamente.
 - **Railway**: cada `push` na `main` redeploya a API automaticamente.
@@ -187,7 +227,7 @@ O seed usa as variáveis do Railway (`SEED_ADMIN_EMAIL` / `SEED_ADMIN_PASSWORD`)
 
 ---
 
-## 8. Solução de problemas
+## 9. Solução de problemas
 
 | Sintoma | Causa provável | Correção |
 |---|---|---|
@@ -201,7 +241,7 @@ O seed usa as variáveis do Railway (`SEED_ADMIN_EMAIL` / `SEED_ADMIN_PASSWORD`)
 
 ---
 
-## 9. Custos estimados
+## 10. Custos estimados
 
 | Item | Serviço | Custo |
 |---|---|---|
@@ -215,7 +255,7 @@ O seed usa as variáveis do Railway (`SEED_ADMIN_EMAIL` / `SEED_ADMIN_PASSWORD`)
 
 ---
 
-## 10. Checklist resumido
+## 11. Checklist resumido
 
 - [ ] Railway: criar projeto + MySQL
 - [ ] Railway: criar serviço da API (Dockerfile `apps/api/Dockerfile`, root `/`)
@@ -225,4 +265,5 @@ O seed usa as variáveis do Railway (`SEED_ADMIN_EMAIL` / `SEED_ADMIN_PASSWORD`)
 - [ ] Vercel: deploy + anotar URL
 - [ ] Railway: definir `CORS_ORIGIN` = URL da Vercel
 - [ ] Rodar seed do admin (Railway CLI)
+- [ ] (Opcional) Domínio próprio na Vercel/Railway + atualizar `CORS_ORIGIN` e `NEXT_PUBLIC_*` (rebuild da web)
 - [ ] Testar: `/health`, login, mapa, GPS, WebSocket, PWA no Android
