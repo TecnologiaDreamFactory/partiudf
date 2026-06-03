@@ -16,9 +16,20 @@
     "prettier": "^3.2.5",
     "turbo": "^2.3.0"
   },
-  "packageManager": "pnpm@11.5.0",
+  "packageManager": "pnpm@9.14.2",
   "engines": {
     "node": ">=20",
     "pnpm": ">=9"
+  },
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "@nestjs/core",
+      "@prisma/client",
+      "@prisma/engines",
+      "bcrypt",
+      "esbuild",
+      "prisma",
+      "sharp"
+    ]
   }
 }
