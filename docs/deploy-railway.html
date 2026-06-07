@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Deploy Partiu DF — Vercel + Railway</title>
+<title>Deploy Partiu DF — Railway</title>
 <style>
   :root {
     --bg: #0f1117;
@@ -112,8 +112,8 @@
 
   <header class="hero">
     <span class="badge">GUIA DE DEPLOY</span>
-    <h1>Partiu DF — Deploy na Vercel + Railway</h1>
-    <p>Web (Next.js) na Vercel · API (NestJS) + MySQL no Railway · sem VPS · ~US$5/mês</p>
+    <h1>Partiu DF — Deploy no Railway</h1>
+    <p>Web (Next.js) + API (NestJS) + MySQL · tudo no Railway · sem VPS · plano Hobby US$5/mês</p>
   </header>
 
   <div class="card">
@@ -122,7 +122,7 @@
       <a href="#arquitetura">1. Por que essa arquitetura</a>
       <a href="#prereq">2. Pré-requisitos</a>
       <a href="#fase1">3. Fase 1 — Railway (MySQL + API)</a>
-      <a href="#fase2">4. Fase 2 — Vercel (Web)</a>
+      <a href="#fase2">4. Fase 2 — Railway (Web)</a>
       <a href="#fase3">5. Fase 3 — Ligar os dois</a>
       <a href="#dominio">6. Domínio próprio (opcional)</a>
       <a href="#verificacao">7. Verificação final</a>
@@ -142,17 +142,19 @@
     <tr><td><strong>MySQL</strong></td><td>Prisma (adapter mariadb)</td><td>Banco de dados persistente</td></tr>
   </table>
   <p>Hospedagem compartilhada / "Site estático" <strong>não roda</strong> API NestJS, WebSocket nem MySQL.
-     Sem VPS, a solução é <strong>separar cada peça</strong> num serviço adequado:</p>
+     A solução adotada é hospedar <strong>as três peças no Railway</strong>, cada uma como um
+     <strong>serviço</strong> dentro do <strong>mesmo projeto</strong> (assim elas se enxergam pela rede
+     interna e compartilham variáveis):</p>
   <div class="arch">                 Internet (HTTPS)
                        │
         ┌──────────────┴──────────────┐
         │                             │
-   partiudf.vercel.app        SUA-API.up.railway.app
+  partiudf-web.up.railway.app   partiudf-api.up.railway.app
         │                             │
    ┌────▼────┐                  ┌─────▼─────┐
    │  WEB    │  ── fetch ─────▶ │   API     │
    │ Next.js │  ── WebSocket ─▶ │  NestJS   │
-   │ (Vercel)│                  │ (Railway) │
+   │(Railway)│                  │ (Railway) │
    └─────────┘                  └─────┬─────┘
                                       │
                                 ┌─────▼─────┐
@@ -160,18 +162,18 @@
                                 │ (Railway) │
                                 └───────────┘</div>
   <div class="warn"><strong>A ordem do deploy importa:</strong> a Web precisa da URL da API, e a API
-    precisa da URL da Web (CORS). Por isso: <strong>Railway primeiro</strong> (API + banco) →
-    <strong>Vercel depois</strong> (web) → <strong>ligar os dois</strong> no fim.</div>
+    precisa da URL da Web (CORS). Por isso: <strong>MySQL + API primeiro</strong> →
+    <strong>Web depois</strong> → <strong>ligar os dois</strong> (CORS) no fim.</div>
 
   <h2 id="prereq">2. Pré-requisitos</h2>
   <ul>
     <li>Conta no <strong>GitHub</strong> com o repositório <code>TecnologiaDreamFactory/partiudf</code>.</li>
     <li>Conta no <strong>Railway</strong> — <a href="https://railway.app">railway.app</a></li>
-    <li>Conta na <strong>Vercel</strong> — <a href="https://vercel.com">vercel.com</a></li>
-    <li><strong>Node.js 20+</strong> instalado localmente (para o seed via CLI).</li>
+    <li><strong>Node.js 20+</strong> instalado localmente (para gerar o <code>JWT_SECRET</code> e rodar o seed via CLI).</li>
   </ul>
   <div class="note">O repositório já está preparado: <code>apps/api/Dockerfile</code>,
-    <code>apps/api/entrypoint.sh</code> (roda <code>prisma migrate deploy</code> no boot) e
+    <code>apps/api/entrypoint.sh</code> (roda <code>prisma migrate deploy</code> no boot),
+    <code>apps/web/Dockerfile</code> (Web Next.js; recebe <code>NEXT_PUBLIC_*</code> como <strong>build args</strong>) e
     <code>package.json</code> com <code>packageManager: pnpm@9.14.2</code> +
     <code>pnpm.onlyBuiltDependencies</code> (libera build de <code>bcrypt</code>, <code>prisma</code>,
     <code>sharp</code>, etc.).</div>
@@ -223,34 +225,33 @@ API running on port XXXX</code></pre>
   <p>Se aparecer erro de conexão, confira <code>DATABASE_URL = ${{MySQL.MYSQL_URL}}</code> e se o
      MySQL está no mesmo projeto.</p>
 
-  <h2 id="fase2"><span class="phase-num">2</span>Fase 2 — Vercel (Web)</h2>
+  <h2 id="fase2"><span class="phase-num">2</span>Fase 2 — Railway (Web)</h2>
   <div class="warn">Faça esta fase <strong>somente depois</strong> de ter a URL pública da API (Fase 1).</div>
   <ol>
-    <li>Acesse <a href="https://vercel.com">vercel.com</a> → <strong>Add New → Project</strong> →
-      importe <code>TecnologiaDreamFactory/partiudf</code>.</li>
-    <li><strong>Root Directory</strong>: <code>apps/web</code> (a Vercel detecta Next.js + Turborepo).</li>
-    <li>Em <strong>Environment Variables</strong>, adicione (troque pela URL real da API):</li>
+    <li>No <strong>mesmo projeto</strong> do Railway → <strong>New</strong> → <strong>GitHub Repo</strong> →
+      selecione novamente <code>TecnologiaDreamFactory/partiudf</code> (vira um <strong>segundo serviço</strong>, o da Web).</li>
+    <li>Em <strong>Settings</strong> do serviço da Web:
+      <ul>
+        <li><strong>Root Directory</strong>: <code>/</code> (o Dockerfile copia a partir da raiz)</li>
+        <li><strong>Build → Dockerfile Path</strong>: <code>apps/web/Dockerfile</code></li>
+      </ul>
+    </li>
+    <li>Em <strong>Variables</strong>, adicione (troque pela URL real da API da Fase 1):</li>
   </ol>
   <table>
     <tr><th>Variável</th><th>Valor</th></tr>
     <tr><td><code>NEXT_PUBLIC_API_URL</code></td><td><code>https://SUA-API.up.railway.app</code></td></tr>
     <tr><td><code>NEXT_PUBLIC_WS_URL</code></td><td><code>https://SUA-API.up.railway.app</code></td></tr>
   </table>
-  <div class="warn">As <code>NEXT_PUBLIC_*</code> são <strong>embutidas no build</strong>. Se mudar a URL
-    da API depois, é preciso <strong>rebuildar</strong> a web (Deployments → Redeploy).</div>
+  <div class="warn">As <code>NEXT_PUBLIC_*</code> são <strong>embutidas no build</strong> (o
+    <code>apps/web/Dockerfile</code> as recebe como <code>ARG</code>). O Railway repassa as variáveis do
+    serviço como <strong>build args</strong> automaticamente. Se mudar a URL da API depois, é preciso
+    <strong>redeployar</strong> a Web (Deployments → Redeploy) para reembutir o valor.
+    <strong>Não</strong> defina <code>PORT</code> (o Railway injeta; o Dockerfile usa <code>${PORT}</code>).</div>
   <ol start="4">
-    <li>Clique em <strong>Deploy</strong>. Ao terminar, a Vercel te dá uma URL
-      (ex.: <code>partiudf.vercel.app</code>). <strong>Anote.</strong></li>
+    <li><strong>Settings → Networking → Generate Domain</strong> para a Web ganhar uma URL pública
+      (ex.: <code>partiudf-web.up.railway.app</code>). <strong>Anote essa URL</strong> — usada na Fase 3 (CORS).</li>
   </ol>
-
-  <h3>4.1 Se o build da web falhar (fallback do monorepo)</h3>
-  <p>A web depende do pacote <code>@partiudf/shared</code>. Se a Vercel não buildar o shared
-     automaticamente, ajuste em <strong>Settings → Build &amp; Development Settings</strong>:</p>
-  <table>
-    <tr><th>Campo</th><th>Valor</th></tr>
-    <tr><td>Build Command</td><td><code>cd ../.. &amp;&amp; pnpm --filter @partiudf/shared build &amp;&amp; pnpm --filter @partiudf/web build</code></td></tr>
-    <tr><td>Install Command</td><td><code>cd ../.. &amp;&amp; pnpm install --frozen-lockfile</code></td></tr>
-  </table>
 
   <h2 id="fase3"><span class="phase-num">3</span>Fase 3 — Ligar os dois (CORS + admin)</h2>
 
@@ -260,10 +261,10 @@ API running on port XXXX</code></pre>
   </ol>
   <table>
     <tr><th>Variável</th><th>Valor</th></tr>
-    <tr><td><code>CORS_ORIGIN</code></td><td>URL da Vercel com <code>https://</code> e <strong>sem barra final</strong> (ex.: <code>https://partiudf.vercel.app</code>)</td></tr>
+    <tr><td><code>CORS_ORIGIN</code></td><td>URL da Web no Railway com <code>https://</code> e <strong>sem barra final</strong> (ex.: <code>https://partiudf-web.up.railway.app</code>)</td></tr>
   </table>
   <p>Salvar reinicia a API (o CORS é lido no boot). Para vários domínios, separe por vírgula:
-     <code>https://partiudf.vercel.app,https://www.seudominio.com</code>.</p>
+     <code>https://partiudf-web.up.railway.app,https://www.seudominio.com</code>.</p>
 
   <h3>5.2 Criar o admin (seed — roda uma vez)</h3>
   <pre><code>npm i -g @railway/cli
@@ -273,57 +274,51 @@ railway run pnpm --filter @partiudf/api prisma:seed:prod</code></pre>
   <p>O seed usa <code>SEED_ADMIN_EMAIL</code> / <code>SEED_ADMIN_PASSWORD</code> do Railway para criar o admin.</p>
 
   <h2 id="dominio">6. Domínio próprio (opcional)</h2>
-  <p>Tanto <strong>Railway</strong> quanto <strong>Vercel</strong> aceitam domínio próprio com
-     <strong>HTTPS automático</strong>. O recomendado são <strong>dois subdomínios</strong>:</p>
+  <p>O <strong>Railway</strong> aceita domínio próprio com <strong>HTTPS automático</strong>. O recomendado
+     são <strong>dois subdomínios</strong> (um para a Web, um para a API):</p>
   <table>
     <tr><th>Peça</th><th>Onde</th><th>Domínio sugerido</th></tr>
-    <tr><td>Web</td><td>Vercel</td><td><code>app.seudominio.com.br</code> (ou a raiz <code>seudominio.com.br</code>)</td></tr>
+    <tr><td>Web</td><td>Railway</td><td><code>app.seudominio.com.br</code> (ou a raiz <code>seudominio.com.br</code>)</td></tr>
     <tr><td>API</td><td>Railway</td><td><code>api.seudominio.com.br</code></td></tr>
     <tr><td>MySQL</td><td>Railway</td><td>— (interno, sem domínio público)</td></tr>
   </table>
 
-  <h3>6.1 API no Railway</h3>
+  <h3>6.1 Configurar o domínio (Web e API)</h3>
+  <p>Para <strong>cada</strong> serviço (Web e API):</p>
   <ol>
-    <li>Railway → serviço da API → <strong>Settings → Networking → Custom Domain</strong>.</li>
-    <li>Digite <code>api.seudominio.com.br</code>.</li>
+    <li>Railway → serviço → <strong>Settings → Networking → Custom Domain</strong>.</li>
+    <li>Digite o subdomínio desejado (<code>app.seudominio.com.br</code> para a Web,
+      <code>api.seudominio.com.br</code> para a API).</li>
     <li>O Railway mostra um registro <strong>CNAME</strong> (ex.: <code>api</code> → <code>xxxx.up.railway.app</code>). Crie-o no seu provedor de DNS.</li>
     <li>Aguarde a propagação (minutos a algumas horas). O <strong>SSL é emitido automaticamente</strong>.</li>
   </ol>
 
-  <h3>6.2 Web na Vercel</h3>
-  <ol>
-    <li>Vercel → projeto → <strong>Settings → Domains → Add</strong>.</li>
-    <li>Digite <code>app.seudominio.com.br</code> (ou a raiz <code>seudominio.com.br</code>).</li>
-    <li>Crie o registro que a Vercel indicar (<strong>CNAME</strong> para subdomínio; <strong>A/ALIAS</strong> para a raiz).</li>
-    <li>SSL automático.</li>
-  </ol>
-
-  <h3>6.3 Atualizar as variáveis (obrigatório)</h3>
+  <h3>6.2 Atualizar as variáveis (obrigatório)</h3>
   <p>Ao migrar para o domínio próprio, ajuste estas variáveis — senão CORS/WebSocket quebram:</p>
   <table>
     <tr><th>Onde</th><th>Variável</th><th>Novo valor</th></tr>
     <tr><td>Railway (API)</td><td><code>CORS_ORIGIN</code></td><td><code>https://app.seudominio.com.br</code></td></tr>
-    <tr><td>Vercel (Web)</td><td><code>NEXT_PUBLIC_API_URL</code></td><td><code>https://api.seudominio.com.br</code></td></tr>
-    <tr><td>Vercel (Web)</td><td><code>NEXT_PUBLIC_WS_URL</code></td><td><code>https://api.seudominio.com.br</code></td></tr>
+    <tr><td>Railway (Web)</td><td><code>NEXT_PUBLIC_API_URL</code></td><td><code>https://api.seudominio.com.br</code></td></tr>
+    <tr><td>Railway (Web)</td><td><code>NEXT_PUBLIC_WS_URL</code></td><td><code>https://api.seudominio.com.br</code></td></tr>
   </table>
-  <div class="warn">As <code>NEXT_PUBLIC_*</code> são embutidas no build → <strong>rebuilde a web</strong>
-    na Vercel depois de mudar. Railway e Vercel <strong>não cobram extra</strong> por domínio próprio;
+  <div class="warn">As <code>NEXT_PUBLIC_*</code> são embutidas no build → <strong>redeploye a Web</strong>
+    no Railway depois de mudar. O Railway <strong>não cobra extra</strong> por domínio próprio;
     você paga só o registrador (~R$40–60/ano).</div>
 
   <h2 id="verificacao">7. Verificação final</h2>
   <ol>
     <li>Abra <code>https://SUA-API.up.railway.app/health</code> → deve responder <code>{"ok":true,...}</code>.</li>
-    <li>Abra a URL da Vercel no navegador.</li>
+    <li>Abra a URL da Web no Railway no navegador.</li>
     <li>Faça <strong>login</strong> com o admin do seed (senha numérica).</li>
     <li>Teste: mapa, rastreamento GPS, WebSocket (tempo real).</li>
   </ol>
   <div class="note"><strong>PWA + geolocalização</strong> só funcionam em <strong>HTTPS</strong> —
-    Vercel e Railway já fornecem HTTPS por padrão. ✅</div>
+    o Railway já fornece HTTPS por padrão. ✅</div>
 
   <h2 id="cicd">8. CI/CD (deploy automático)</h2>
   <ul>
-    <li><strong>Vercel</strong>: cada <code>push</code> na <code>main</code> redeploya a web.</li>
-    <li><strong>Railway</strong>: cada <code>push</code> na <code>main</code> redeploya a API.</li>
+    <li><strong>Railway (API)</strong>: cada <code>push</code> na <code>main</code> redeploya a API.</li>
+    <li><strong>Railway (Web)</strong>: cada <code>push</code> na <code>main</code> redeploya a Web.</li>
     <li>Migrations rodam sozinhas no boot da API (<code>entrypoint.sh → prisma migrate deploy</code>).</li>
   </ul>
 
@@ -333,39 +328,42 @@ railway run pnpm --filter @partiudf/api prisma:seed:prod</code></pre>
     <tr><td><code>ERR_VM_DYNAMIC_IMPORT_CALLBACK_MISSING</code></td><td>pnpm novo em Node antigo</td><td>Node 20+ no ambiente (resolvido)</td></tr>
     <tr><td>Corepack reclama da versão do pnpm</td><td><code>packageManager</code> ≠ pnpm do ambiente</td><td>manter <code>pnpm@9.14.2</code> (no repo)</td></tr>
     <tr><td><code>ignored build scripts</code> (bcrypt/prisma/sharp)</td><td>pnpm 10/11 bloqueia scripts nativos</td><td><code>pnpm.onlyBuiltDependencies</code> (no <code>package.json</code>)</td></tr>
-    <tr><td>Erro de CORS na web</td><td><code>CORS_ORIGIN</code> errado</td><td>bater exatamente com a URL da Vercel (https, sem barra)</td></tr>
-    <tr><td>WebSocket não conecta</td><td><code>NEXT_PUBLIC_WS_URL</code> ou CORS</td><td>apontar para a API e rebuildar a web</td></tr>
+    <tr><td>Erro de CORS na web</td><td><code>CORS_ORIGIN</code> errado</td><td>bater exatamente com a URL da Web no Railway (https, sem barra)</td></tr>
+    <tr><td>WebSocket não conecta</td><td><code>NEXT_PUBLIC_WS_URL</code> ou CORS</td><td>apontar para a API e <strong>redeployar a Web</strong></td></tr>
+    <tr><td>Web mostra URL de API antiga</td><td><code>NEXT_PUBLIC_*</code> é embutida no build</td><td>mudar a variável e <strong>redeployar a Web</strong> (rebuild)</td></tr>
     <tr><td>Login 400/401</td><td>senha não numérica ou admin ausente</td><td>senha só com dígitos; rodar o seed (5.2)</td></tr>
     <tr><td>API não conecta no banco</td><td><code>DATABASE_URL</code> errado</td><td>usar <code>${{MySQL.MYSQL_URL}}</code>; MySQL no mesmo projeto</td></tr>
   </table>
 
   <h2 id="custos">10. Custos estimados</h2>
+  <p>Com <strong>tudo no Railway</strong>, usamos o plano <strong>Hobby (US$5/mês)</strong>, que cobre os
+     três serviços (Web + API + MySQL). Os US$5 já incluem uma franquia de uso; só se passar dela é que
+     paga o excedente — e na prática isso fica em <strong>centavos</strong>.</p>
   <table>
     <tr><th>Item</th><th>Serviço</th><th>Custo</th></tr>
-    <tr><td>Web</td><td>Vercel (Hobby)</td><td>Grátis</td></tr>
-    <tr><td>API + MySQL</td><td>Railway</td><td>~US$5/mês (uso)</td></tr>
-    <tr><td>HTTPS / SSL</td><td>Vercel + Railway</td><td>Grátis (automático)</td></tr>
+    <tr><td>Web + API + MySQL</td><td>Railway (Hobby)</td><td>US$5/mês (+ centavos só se estourar a franquia)</td></tr>
+    <tr><td>HTTPS / SSL</td><td>Railway</td><td>Grátis (automático)</td></tr>
     <tr><td>Domínio próprio (opcional)</td><td>registrador</td><td>~R$40–60/ano</td></tr>
   </table>
-  <div class="note">Para domínio próprio: adicione-o na Vercel (web) e, se quiser
-    <code>api.seudominio.com</code>, também no Railway — depois atualize <code>CORS_ORIGIN</code> e as
-    <code>NEXT_PUBLIC_*</code> (com rebuild da web).</div>
+  <div class="note">Como agora a Web também roda no Railway (não mais na Vercel), ela soma ao consumo do
+    projeto. Acompanhe o uso no painel <strong>Usage</strong> do Railway para não estourar a franquia do Hobby.</div>
 
   <h2 id="checklist">11. Checklist resumido</h2>
   <ul class="checklist">
     <li>Railway: criar projeto + MySQL</li>
-    <li>Railway: criar serviço da API (Dockerfile <code>apps/api/Dockerfile</code>, root <code>/</code>)</li>
-    <li>Railway: variáveis <code>DATABASE_URL</code>, <code>JWT_SECRET</code>, <code>SEED_ADMIN_EMAIL</code>, <code>SEED_ADMIN_PASSWORD</code></li>
+    <li>Railway: criar serviço da <strong>API</strong> (Dockerfile <code>apps/api/Dockerfile</code>, root <code>/</code>)</li>
+    <li>Railway: variáveis da API <code>DATABASE_URL</code>, <code>JWT_SECRET</code>, <code>SEED_ADMIN_EMAIL</code>, <code>SEED_ADMIN_PASSWORD</code></li>
     <li>Railway: gerar domínio público da API</li>
-    <li>Vercel: importar repo, root <code>apps/web</code>, <code>NEXT_PUBLIC_API_URL</code> / <code>NEXT_PUBLIC_WS_URL</code></li>
-    <li>Vercel: deploy + anotar URL</li>
-    <li>Railway: definir <code>CORS_ORIGIN</code> = URL da Vercel</li>
+    <li>Railway: criar serviço da <strong>Web</strong> (Dockerfile <code>apps/web/Dockerfile</code>, root <code>/</code>)</li>
+    <li>Railway: variáveis da Web <code>NEXT_PUBLIC_API_URL</code> / <code>NEXT_PUBLIC_WS_URL</code></li>
+    <li>Railway: gerar domínio público da Web</li>
+    <li>Railway: definir <code>CORS_ORIGIN</code> (na API) = URL da Web</li>
     <li>Rodar seed do admin (Railway CLI)</li>
-    <li>(Opcional) Domínio próprio na Vercel/Railway + atualizar <code>CORS_ORIGIN</code> e <code>NEXT_PUBLIC_*</code> (rebuild da web)</li>
+    <li>(Opcional) Domínio próprio na Web/API + atualizar <code>CORS_ORIGIN</code> e <code>NEXT_PUBLIC_*</code> (redeploy da Web)</li>
     <li>Testar: <code>/health</code>, login, mapa, GPS, WebSocket, PWA no Android</li>
   </ul>
 
-  <footer>Partiu DF · Guia de deploy Vercel + Railway · gerado em 2026-06-02</footer>
+  <footer>Partiu DF · Guia de deploy no Railway · gerado em 2026-06-07</footer>
 
 </div>
 </body>

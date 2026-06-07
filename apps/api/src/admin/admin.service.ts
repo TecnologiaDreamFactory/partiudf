@@ -21,6 +21,12 @@ const userSelect = {
 
 const VALID_ROLES: UserRole[] = ['ADMIN', 'DRIVER', 'PASSENGER'];
 
+/** Filtro que identifica as sessões anônimas de passageiro (logins guest). */
+const GUEST_LOGIN_WHERE = {
+  role: 'PASSENGER' as UserRole,
+  email: { startsWith: 'guest_', endsWith: '@passenger.local' },
+} as const;
+
 @Injectable()
 export class AdminService {
   constructor(
@@ -153,6 +159,59 @@ export class AdminService {
     };
   }
 
+  async deleteUser(id: string, requesterId?: string): Promise<{ ok: boolean }> {
+    if (requesterId && requesterId === id) {
+      throw new BadRequestException('Você não pode excluir a própria conta');
+    }
+
+    const existing = await this.prisma.user.findUnique({
+      where: { id },
+      include: { _count: { select: { trips: true } } },
+    });
+    if (!existing) {
+      throw new NotFoundException('Usuário não encontrado');
+    }
+    if (existing._count.trips > 0) {
+      throw new BadRequestException(
+        'Não é possível excluir: este motorista possui viagens registradas',
+      );
+    }
+
+    // Check-ins do usuário são removidos em cascata (onDelete: Cascade no schema).
+    await this.prisma.user.delete({ where: { id } });
+    return { ok: true };
+  }
+
+  /** Relatório de logins (sessões anônimas) de passageiros. */
+  async listPassengerLogins(): Promise<PassengerLoginDto[]> {
+    const users = await this.prisma.user.findMany({
+      where: GUEST_LOGIN_WHERE,
+      select: {
+        id: true,
+        email: true,
+        name: true,
+        createdAt: true,
+        _count: { select: { checkins: true } },
+      },
+      orderBy: { createdAt: 'desc' },
+    });
+
+    return users.map((u) => ({
+      id: u.id,
+      email: u.email,
+      name: u.name,
+      createdAt: u.createdAt.toISOString(),
+      checkinsCount: u._count.checkins,
+    }));
+  }
+
+  /** Exclui todos os logins (sessões anônimas) de passageiros. */
+  async deletePassengerLogins(): Promise<{ ok: boolean; deleted: number }> {
+    // Check-ins associados são removidos em cascata (onDelete: Cascade no schema).
+    const result = await this.prisma.user.deleteMany({ where: GUEST_LOGIN_WHERE });
+    return { ok: true, deleted: result.count };
+  }
+
   /** Pickup Points CRUD */
   async listPickupPoints(): Promise<PickupPointDto[]> {
     const items = await this.prisma.pickupPoint.findMany({
@@ -275,6 +334,14 @@ export class AdminService {
     await this.prisma.pickupPoint.delete({ where: { id } });
     return { ok: true };
   }
+}
+
+export interface PassengerLoginDto {
+  id: string;
+  email: string;
+  name: string | null;
+  createdAt: string;
+  checkinsCount: number;
 }
 
 export interface PickupPointDto {

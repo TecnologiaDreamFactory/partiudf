@@ -7,7 +7,10 @@ import {
   fetchAdminUsers,
   createAdminUser,
   updateAdminUser,
+  deleteAdminUser,
   type AdminUser,
+  fetchAdminPassengerLogins,
+  deleteAdminPassengerLogins,
   fetchAdminPickupPoints,
   createAdminPickupPoint,
   updateAdminPickupPoint,
@@ -47,6 +50,10 @@ export default function AdminPage() {
   const [editAvatarUrl, setEditAvatarUrl] = useState('');
   const [editPassword, setEditPassword] = useState('');
   const [editSaving, setEditSaving] = useState(false);
+  const [deletingUserId, setDeletingUserId] = useState<string | null>(null);
+
+  const [loginsReportLoading, setLoginsReportLoading] = useState(false);
+  const [loginsDeleting, setLoginsDeleting] = useState(false);
 
   const [pickupPoints, setPickupPoints] = useState<AdminPickupPoint[]>([]);
   const [ppLoading, setPpLoading] = useState(true);
@@ -161,6 +168,86 @@ export default function AdminPage() {
       setError(e instanceof Error ? e.message : 'Erro ao atualizar');
     } finally {
       setEditSaving(false);
+    }
+  };
+
+  const handleDeleteUser = async (u: AdminUser) => {
+    if (
+      !window.confirm(
+        `Tem certeza que deseja excluir "${u.name || u.email}"? Esta ação não pode ser desfeita.`,
+      )
+    )
+      return;
+    setError('');
+    setDeletingUserId(u.id);
+    try {
+      await deleteAdminUser(u.id);
+      setUsers((prev) => prev.filter((x) => x.id !== u.id));
+    } catch (e) {
+      setError(e instanceof Error ? e.message : 'Erro ao excluir usuário');
+    } finally {
+      setDeletingUserId(null);
+    }
+  };
+
+  const handleGenerateLoginsReport = async () => {
+    setError('');
+    setLoginsReportLoading(true);
+    try {
+      const logins = await fetchAdminPassengerLogins();
+      if (logins.length === 0) {
+        window.alert('Nenhum login de passageiro encontrado.');
+        return;
+      }
+      const header = ['ID', 'Email', 'Nome', 'Check-ins', 'Data de criacao'];
+      const escape = (v: string) => `"${v.replace(/"/g, '""')}"`;
+      const rows = logins.map((l) =>
+        [
+          l.id,
+          l.email,
+          l.name ?? '',
+          String(l.checkinsCount),
+          new Date(l.createdAt).toLocaleString('pt-BR'),
+        ]
+          .map(escape)
+          .join(','),
+      );
+      const csv = [header.map(escape).join(','), ...rows].join('\r\n');
+      const blob = new Blob(['﻿' + csv], { type: 'text/csv;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `logins-passageiros-${new Date().toISOString().slice(0, 10)}.csv`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    } catch (e) {
+      setError(e instanceof Error ? e.message : 'Erro ao gerar relatório');
+    } finally {
+      setLoginsReportLoading(false);
+    }
+  };
+
+  const handleDeleteLogins = async () => {
+    if (
+      !window.confirm(
+        'Tem certeza que deseja excluir TODOS os logins de passageiros? Os check-ins associados também serão removidos. Esta ação não pode ser desfeita.',
+      )
+    )
+      return;
+    setError('');
+    setLoginsDeleting(true);
+    try {
+      const { deleted } = await deleteAdminPassengerLogins();
+      window.alert(`${deleted} login(s) de passageiro excluído(s).`);
+      // Atualiza a lista de usuários caso esteja exibindo passageiros.
+      const refreshed = await fetchAdminUsers(roleFilter || undefined);
+      setUsers(refreshed);
+    } catch (e) {
+      setError(e instanceof Error ? e.message : 'Erro ao excluir logins');
+    } finally {
+      setLoginsDeleting(false);
     }
   };
 
@@ -307,6 +394,32 @@ export default function AdminPage() {
           <div className="flex items-end">
             <Button type="button" onClick={() => setShowCreate(true)}>
               Novo usuário
+            </Button>
+          </div>
+        </div>
+
+        <hr className="my-4 border-df-border" />
+        <div>
+          <p className="mb-2 text-sm font-medium text-df-ink">
+            Logins de passageiros (sessões anônimas)
+          </p>
+          <div className="flex flex-wrap gap-2">
+            <Button
+              type="button"
+              variant="ghost"
+              onClick={handleGenerateLoginsReport}
+              disabled={loginsReportLoading}
+            >
+              {loginsReportLoading ? 'Gerando…' : 'Gerar relatório (CSV)'}
+            </Button>
+            <Button
+              type="button"
+              variant="ghost"
+              onClick={handleDeleteLogins}
+              disabled={loginsDeleting}
+              className="text-red-600 hover:bg-red-50 hover:text-red-700"
+            >
+              {loginsDeleting ? 'Excluindo…' : 'Excluir logins de passageiros'}
             </Button>
           </div>
         </div>
@@ -554,13 +667,24 @@ export default function AdminPage() {
                           </div>
                         </div>
                       ) : (
-                        <Button
-                          type="button"
-                          variant="ghost"
-                          onClick={() => startEdit(u)}
-                        >
-                          Editar
-                        </Button>
+                        <div className="flex gap-2">
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            onClick={() => startEdit(u)}
+                          >
+                            Editar
+                          </Button>
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            onClick={() => handleDeleteUser(u)}
+                            disabled={deletingUserId === u.id}
+                            className="text-red-600 hover:bg-red-50 hover:text-red-700"
+                          >
+                            {deletingUserId === u.id ? 'Excluindo…' : 'Excluir'}
+                          </Button>
+                        </div>
                       )}
                     </td>
                   </tr>

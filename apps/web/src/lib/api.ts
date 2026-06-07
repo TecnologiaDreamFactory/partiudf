@@ -183,6 +183,33 @@ export async function updateAdminUser(
   });
 }
 
+/** DELETE /admin/users/:id */
+export async function deleteAdminUser(id: string): Promise<{ ok: boolean }> {
+  return apiFetch<{ ok: boolean }>(`/admin/users/${id}`, {
+    method: 'DELETE',
+  });
+}
+
+export interface AdminPassengerLogin {
+  id: string;
+  email: string;
+  name: string | null;
+  createdAt: string;
+  checkinsCount: number;
+}
+
+/** GET /admin/passenger-logins */
+export async function fetchAdminPassengerLogins(): Promise<AdminPassengerLogin[]> {
+  return apiFetch<AdminPassengerLogin[]>('/admin/passenger-logins');
+}
+
+/** DELETE /admin/passenger-logins */
+export async function deleteAdminPassengerLogins(): Promise<{ ok: boolean; deleted: number }> {
+  return apiFetch<{ ok: boolean; deleted: number }>('/admin/passenger-logins', {
+    method: 'DELETE',
+  });
+}
+
 export interface AdminPickupPoint {
   id: string;
   code: string;

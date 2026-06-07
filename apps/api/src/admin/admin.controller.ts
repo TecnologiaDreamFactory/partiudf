@@ -14,7 +14,11 @@ import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { User, type ValidatedUser } from '../auth/auth.controller';
 import { Roles } from '../auth/roles.decorator';
 import { RolesGuard } from '../auth/roles.guard';
-import { AdminService, type PickupPointDto } from './admin.service';
+import {
+  AdminService,
+  type PickupPointDto,
+  type PassengerLoginDto,
+} from './admin.service';
 
 export interface AdminUserDto {
   id: string;
@@ -61,6 +65,28 @@ export class AdminController {
     @User() _user?: ValidatedUser,
   ): Promise<AdminUserDto> {
     return this.adminService.updateUser(id, body);
+  }
+
+  @Delete('users/:id')
+  async deleteUser(
+    @Param('id') id: string,
+    @User() user?: ValidatedUser,
+  ): Promise<{ ok: boolean }> {
+    return this.adminService.deleteUser(id, user?.userId);
+  }
+
+  @Get('passenger-logins')
+  async listPassengerLogins(
+    @User() _user?: ValidatedUser,
+  ): Promise<PassengerLoginDto[]> {
+    return this.adminService.listPassengerLogins();
+  }
+
+  @Delete('passenger-logins')
+  async deletePassengerLogins(
+    @User() _user?: ValidatedUser,
+  ): Promise<{ ok: boolean; deleted: number }> {
+    return this.adminService.deletePassengerLogins();
   }
 
   @Get('pickup-points')
