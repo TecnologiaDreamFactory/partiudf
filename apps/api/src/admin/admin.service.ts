@@ -164,21 +164,18 @@ export class AdminService {
       throw new BadRequestException('Você não pode excluir a própria conta');
     }
 
-    const existing = await this.prisma.user.findUnique({
-      where: { id },
-      include: { _count: { select: { trips: true } } },
-    });
+    const existing = await this.prisma.user.findUnique({ where: { id } });
     if (!existing) {
       throw new NotFoundException('Usuário não encontrado');
     }
-    if (existing._count.trips > 0) {
-      throw new BadRequestException(
-        'Não é possível excluir: este motorista possui viagens registradas',
-      );
-    }
 
-    // Check-ins do usuário são removidos em cascata (onDelete: Cascade no schema).
-    await this.prisma.user.delete({ where: { id } });
+    // O admin pode excluir mesmo com viagens ativas: removemos as viagens do
+    // motorista (os check-ins delas saem em cascata) e então o usuário (cujos
+    // próprios check-ins também saem em cascata). Tudo numa transação.
+    await this.prisma.$transaction([
+      this.prisma.trip.deleteMany({ where: { driverId: id } }),
+      this.prisma.user.delete({ where: { id } }),
+    ]);
     return { ok: true };
   }
 
