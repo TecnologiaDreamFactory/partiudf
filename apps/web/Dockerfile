@@ -33,7 +33,7 @@ ENV NEXT_PUBLIC_WS_URL=$NEXT_PUBLIC_WS_URL
 COPY tsconfig.base.json ./
 COPY apps/web ./apps/web
 COPY packages/shared/src ./packages/shared/src
-COPY packages/shared/tsconfig.json ./packages/shared/
+COPY packages/shared/tsconfig.json packages/shared/tsconfig.build.json ./packages/shared/
 # Restaurar node_modules sobrescritos (host não tem por .dockerignore)
 COPY --from=deps /app/apps/web/node_modules ./apps/web/node_modules
 COPY --from=deps /app/packages/shared/node_modules ./packages/shared/node_modules
